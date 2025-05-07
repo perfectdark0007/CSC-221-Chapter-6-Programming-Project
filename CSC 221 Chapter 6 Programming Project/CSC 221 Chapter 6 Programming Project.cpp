@@ -1,4 +1,4 @@
-// CSC 221 Chapter 6 Programming Project.cpp : Project 2 - Safest Driving Area
+// CSC 221 Chapter 6 Programming Project.cpp : Project 2: Safest Driving Area
 // Write a program that asks the user to enter the number of accidents the five regions: North, South, East, West, and Central.
 // The program should then show which region(s) have the lowest accident count and the associated accident number.
 // Functions declared to get the number of accidents and to find the region(s) with the lowest accident count.
