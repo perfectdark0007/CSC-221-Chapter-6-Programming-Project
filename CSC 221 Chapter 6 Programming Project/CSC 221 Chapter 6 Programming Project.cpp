@@ -30,7 +30,7 @@ int main() {
     // Calculate and display the final average score
     double finalScore = calcAverage(score1, score2, score3, score4, score5);
     cout << fixed << setprecision(2);
-    cout << "\nFinal score (average of middle three): " << finalScore << endl;
+    cout << "\nFinal score of performer: " << finalScore << endl;
 
     return 0;
 }
