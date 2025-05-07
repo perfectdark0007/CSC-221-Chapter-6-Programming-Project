@@ -7,67 +7,64 @@
 // Return zero to indicate successful completion of the program.
 
 #include <iostream>
+#include <limits>
 using namespace std;
 
-// Functions set
-void getDimensions(double& length, double& width);
-double calculatePerimeter(double length, double width);
-double calculateArea(double length, double width);
-void displayResults(double perimeter, double area);
-bool askToContinue();
+// Function to get a valid dimension (length or width)
+double getRectangleDimension(const string& dimensionName) {
+    double value;
+    while (true) {
+        cout << "Enter the " << dimensionName << ": ";
+        cin >> value;
 
-int main() {
-    double length, width, perimeter, area;
-    char choice;
-
-    do {
-        getDimensions(length, width);
-        perimeter = calculatePerimeter(length, width);
-        area = calculateArea(length, width);
-        displayResults(perimeter, area);
-    } while (askToContinue());
-
-    cout << "Have a nice day!" << endl;
-    return 0;
+        if (cin.fail()) {
+            cin.clear(); // clear the fail state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // discard invalid input
+            cout << "Invalid input! Please enter a positive number.\n";
+        }
+        else if (value < 0) {
+            cout << "The " << dimensionName << " cannot be negative. Please enter a valid positive number.\n";
+        }
+        else {
+            return value; // valid input, return the value
+        }
+    }
 }
 
-// Input the user's dimensions
-void getDimensions(double& length, double& width) {
-    do {
-        cout << "Enter the length of the rectangle: ";
-        cin >> length;
-        if (length < 0)
-            cout << "Length cannot be negative. Please try again.\n";
-    } while (length < 0);
+// Function to calculate and display the perimeter and area of the rectangle
+void calculateRectangle(double length, double width) {
+    double perimeter = 2 * (length + width);
+    double area = length * width;
 
-    do {
-        cout << "Enter the width of the rectangle: ";
-        cin >> width;
-        if (width < 0)
-            cout << "Width cannot be negative. Please try again.\n";
-    } while (width < 0);
-}
-
-// Calculate the perimeter
-double calculatePerimeter(double length, double width) {
-    return 2 * (length + width);
-}
-
-// Calculate the area
-double calculateArea(double length, double width) {
-    return length * width;
-}
-
-// Display the results
-void displayResults(double perimeter, double area) {
+    cout << "\nFor a rectangle with length " << length << " and width " << width << ":\n";
     cout << "Perimeter: " << perimeter << endl;
     cout << "Area: " << area << endl;
 }
 
-// Function to process another rectangle
-bool askToContinue() {
-    char choice;
-    cout << "Would you like to process another rectangle? (Y/N): ";
-    cin >> choice;
-    return (choice == 'Y' || choice == 'y');
+int main() {
+    double length, width;
+    char repeat = 'y';
+
+    // Loop to keep processing rectangles until user decides to quit
+    while (repeat == 'y' || repeat == 'Y') {
+        // Get valid dimensions for the rectangle
+        length = getRectangleDimension("length");
+        width = getRectangleDimension("width");
+
+        // Calculate and display the perimeter and area
+        calculateRectangle(length, width);
+
+        // Ask the user if they want to process another rectangle
+        cout << "\nDo you want to process another rectangle? (y/n): ";
+        cin >> repeat;
+
+        // Validate response for continuation
+        while (repeat != 'y' && repeat != 'Y' && repeat != 'n' && repeat != 'N') {
+            cout << "Invalid input! Please enter 'y' for yes or 'n' for no: ";
+            cin >> repeat;
+        }
+    }
+
+    cout << "Program has ended. Goodbye!\n";
+    return 0;
 }
