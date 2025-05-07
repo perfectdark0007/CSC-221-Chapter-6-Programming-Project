@@ -9,76 +9,93 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <set>
 #include <algorithm>
+#include <limits>
 using namespace std;
 
-// Function declarations
-int getAccidentCount(const string& regionName);
-void findLowest(const map<string, int>& accidentData);
-
-int main() {
-    map<string, int> accidentData;
-    string region;
-    int accidents;
-
-    cout << "Enter accident data for the following 5 regions: North, South, East, West, and Central.\n";
-
-    while (accidentData.size() < 5) {
-        cout << "\nEnter region name: ";
-        getline(cin, region);
-
-        // Normalize and validate input
-        for (auto& c : region) c = tolower(c);
-        if (region == "north" || region == "south" || region == "east" ||
-            region == "west" || region == "central") {
-            region[0] = toupper(region[0]);
-        }
-        else {
-            cout << "Invalid region name. Please enter either: North, South, East, West, Central.\n";
-            continue;
-        }
-
-        if (accidentData.find(region) != accidentData.end()) {
-            cout << "You've already entered data for the " << region << " region.\n";
-            continue;
-        }
-
-        accidents = getAccidentCount(region);
-        accidentData[region] = accidents;
-    }
-
-    findLowest(accidentData);
-
-    return 0;
+// Convert string to lowercase
+string toLower(const string& s) {
+    string result = s;
+    transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
 }
 
-//  User-defined function to get the number of accidents for a region
+// Standardize region names (e.g., "north" ? "North")
+string formatRegion(const string& input) {
+    string lower = toLower(input);
+    if (lower == "north") return "North";
+    if (lower == "south") return "South";
+    if (lower == "east") return "East";
+    if (lower == "west") return "West";
+    if (lower == "central") return "Central";
+    return "";
+}
+
+// Get validated accident count
 int getAccidentCount(const string& regionName) {
     int accidents;
-    do {
-        cout << "Enter the number of accidents in the " << regionName << " region: ";
+    while (true) {
+        cout << "Enter number of accidents for " << regionName << ": ";
         cin >> accidents;
-        cin.ignore(); // Clear newline character from input buffer
-        if (accidents < 0)
-            cout << "Number cannot be negative. Please try again.\n";
-    } while (accidents < 0);
 
-    return accidents;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Enter a non-negative integer.\n";
+        }
+        else if (accidents < 0) {
+            cout << "Accidents cannot be negative.\n";
+        }
+        else {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return accidents;
+        }
+    }
 }
 
-// Determines and displays all regions with the fewest accidents
-void findLowest(const map<string, int>& accidentData) {
-    // Find the lowest accident count
-    int lowestCount = min_element(accidentData.begin(), accidentData.end(),
-        [](const auto& a, const auto& b) {
-            return a.second < b.second;
-        })->second;
+// Find and display region(s) with lowest accident count
+void findLowest(const map<string, int>& data) {
+    int minAccidents = numeric_limits<int>::max();
+    for (const auto& pair : data) {
+        if (pair.second < minAccidents) {
+            minAccidents = pair.second;
+        }
+    }
 
-    // Display all regions with that lowest count
-    cout << "\nRegion(s) with the fewest accidents (" << lowestCount << "):\n";
-    for (const auto& pair : accidentData) {
-        if (pair.second == lowestCount) {
+    cout << "\nRegion(s) with the fewest accidents (" << minAccidents << "):\n";
+    for (const auto& pair : data) {
+        if (pair.second == minAccidents) {
             cout << "- " << pair.first << endl;
         }
     }
+}
+
+int main() {
+    set<string> allowedRegions = { "North", "South", "East", "West", "Central" };
+    map<string, int> accidentData;
+
+    cout << "=== Safe Driving Area Program ===\n";
+    cout << "Please enter accident data for each region (North, South, East, West, Central) in any order.\n";
+
+    while (accidentData.size() < allowedRegions.size()) {
+        string input;
+        cout << "\nEnter region name (" << 5 - accidentData.size() << " remaining): ";
+        getline(cin, input);
+
+        string region = formatRegion(input);
+
+        if (region == "") {
+            cout << "Invalid region. Please enter one of: North, South, East, West, Central.\n";
+        }
+        else if (accidentData.count(region)) {
+            cout << "You already entered data for " << region << ".\n";
+        }
+        else {
+            accidentData[region] = getAccidentCount(region);
+        }
+    }
+
+    findLowest(accidentData);
+    return 0;
 }
